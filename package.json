@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./src/app.ts",
-    "typeorm": "typeorm-ts-node-commonjs"
+    "start": "nodemon ./src/index.ts",
+    "typeorm": "ts-node ./node_modules/.bin/typeorm"
   },
   "keywords": [],
   "author": "",

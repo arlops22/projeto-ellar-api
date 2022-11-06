@@ -5,7 +5,7 @@ import {
     createPlace, 
     updatePlace,
     deletePlace
-} from "./controllers/places-controller";
+} from "./app/controllers/places-controller";
 
 const routes = express.Router();
 
