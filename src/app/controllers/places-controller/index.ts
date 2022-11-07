@@ -7,14 +7,33 @@ const manager = AppDataSource.manager;
 
 export const listPlaces = async (req: Request, res: Response) => {
     try {
-        const places = await manager.find(Places, {
-            relations: {
-                address: true
-            }
+        const builder = manager
+            .getRepository(Places)
+            .createQueryBuilder('places')
+            .leftJoinAndSelect('places.address', 'places_address')
+            .orderBy("places.name", 'DESC');
+
+        const { term, page, perPage } = req.query;
+
+        if (term) {
+            builder.where('LOWER(places.name) LIKE :term', {term: `%${term.toString().toLowerCase()}%`})
+        }
+        
+        const current_page = page ? parseInt(page.toString()) : 1;
+        const current_per_page = perPage ? parseInt(perPage.toString()) : 10;
+
+        builder.offset((current_page - 1) * current_per_page).limit(current_per_page);
+
+        const data = await builder.getMany();
+        const total_elements = await builder.getCount();
+
+        return res.status(200).json({
+            page: current_page,
+            total_pages: Math.ceil(total_elements / current_per_page),
+            data
+
         });
-        return res.status(200).json(places);
     } catch (error) {
-        console.log('error', error)
         return res.status(500).json(error);
     }
 }
@@ -84,7 +103,7 @@ export const deletePlace = async (req: Request, res: Response) => {
         if (!place) {
             return res.status(401).json({error: {message: "Local não encontrado!"}});
         }
-        
+
         await places.remove(place);
         return res.status(200).json({message: "Local removido com sucesso!", place});
 
