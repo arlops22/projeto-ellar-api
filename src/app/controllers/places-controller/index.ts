@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { AppDataSource } from "../../../database";
 import { Places } from "../../models/Places";
+import { Types } from "../../models/Types";
 
 const manager = AppDataSource.manager;
 
@@ -11,6 +12,7 @@ export const listPlaces = async (req: Request, res: Response) => {
             .getRepository(Places)
             .createQueryBuilder('places')
             .leftJoinAndSelect('places.address', 'places_address')
+            .leftJoinAndSelect('places.type', 'types')
             .orderBy("places.name", 'DESC');
 
         const { term, page, perPage } = req.query;
@@ -44,7 +46,8 @@ export const createPlace = async (req: Request, res: Response) => {
             name, 
             description,
             category,
-            address
+            address,
+            type_id
         } = req.body;
 
         const place = new Places();
@@ -53,6 +56,10 @@ export const createPlace = async (req: Request, res: Response) => {
         place.description = description;
         place.category = category;
         place.address = address;
+
+        const types = AppDataSource.getRepository(Types);
+        const type = await types.findOneBy({id: parseInt(type_id)});
+        if (type) place.type = type;
 
         await manager.save(place);
 
@@ -70,20 +77,25 @@ export const updatePlace = async (req: Request, res: Response) => {
             name, 
             description,
             category,
-            address
+            address,
+            type_id
         } = req.body;
 
         const places = AppDataSource.getRepository(Places);
         const place = await places.findOneBy({id: parseInt(id)});
 
         if (!place) {
-            return res.status(401).json({error: {message: "Local não encontrado!"}});
+            return res.status(404).json({error: {message: "Local não encontrado!"}});
         } 
 
         place.name = name;
         place.description = description;
         place.category = category;
         place.address = address;
+
+        const types = AppDataSource.getRepository(Types);
+        const type = await types.findOneBy({id: parseInt(type_id)});
+        if (type) place.type = type;
 
         await manager.save(place);
         return res.status(200).json(place);
@@ -101,7 +113,7 @@ export const deletePlace = async (req: Request, res: Response) => {
         const place = await places.findOneBy({id: parseInt(id)});
 
         if (!place) {
-            return res.status(401).json({error: {message: "Local não encontrado!"}});
+            return res.status(404).json({error: {message: "Local não encontrado!"}});
         }
 
         await places.remove(place);
