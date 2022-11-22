@@ -58,8 +58,11 @@ export const createPlace = async (req: Request, res: Response) => {
         place.address = address;
 
         const types = AppDataSource.getRepository(Types);
-        const type = await types.findOneBy({id: parseInt(type_id)});
-        if (type) place.type = type;
+        const type = await types.findOneBy({id: type_id});
+
+        if (type) {
+            place.type = type_id;
+        }
 
         await manager.save(place);
 
@@ -95,7 +98,7 @@ export const updatePlace = async (req: Request, res: Response) => {
 
         const types = AppDataSource.getRepository(Types);
         const type = await types.findOneBy({id: parseInt(type_id)});
-        if (type) place.type = type;
+        if (type) place.type = type_id;
 
         await manager.save(place);
         return res.status(200).json(place);

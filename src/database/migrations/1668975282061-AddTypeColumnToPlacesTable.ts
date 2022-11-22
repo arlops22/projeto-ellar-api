@@ -23,10 +23,10 @@ export class AddTypeColumnToPlacesTable1668975282061 implements MigrationInterfa
         );
 
         await queryRunner.addColumn(
-            'places',
+            "places",
             new TableColumn({
-                name: "typeId",
-                type: "int",
+                name: 'typeId',
+                type: 'int',
                 isNullable: true
             }),
         );
@@ -39,7 +39,7 @@ export class AddTypeColumnToPlacesTable1668975282061 implements MigrationInterfa
                 referencedTableName: "types",
                 onDelete: "CASCADE",
             }),
-        )
+        );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PlacesAddress } from "./PlacesAddress";
 import { Types } from "./Types";
 
@@ -23,10 +23,8 @@ export class Places {
     @JoinColumn()
     address: PlacesAddress
 
-    @OneToOne(() => Types, (type) => type.id, {
-        cascade: true
-    })
-    @JoinColumn()
+    @ManyToOne(() => Types, (type) => type.places, {nullable: true})
+    @JoinColumn({name: 'typeId'})
     type: Types
     
 }

@@ -1,16 +1,18 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Places } from "./Places";
 
 @Entity()
 export class Types {
 
     @PrimaryGeneratedColumn()
-    id!: number
+    id: number
 
     @Column()
     name: string
     
-    @OneToOne(() => Places, (place) => place.type, {nullable: true})
-    place: Places
+    @OneToMany(() => Places, (place) => place.type, {
+        cascade: true
+    })
+    places: Places[]
 
 }

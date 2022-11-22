@@ -9,6 +9,7 @@ export const AppDataSource = new DataSource({
     password: "postgres",
     database: "projeto_ellar",
     migrationsRun: false,
+    // synchronize: true,
     entities: [
         "src/app/models/*.ts"
     ],
