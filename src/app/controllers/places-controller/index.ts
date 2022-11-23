@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { AppDataSource } from "../../../database";
 import { Places } from "../../models/Places";
+import { PlacesSchedules } from "../../models/PlacesSchedule";
 import { Types } from "../../models/Types";
 
 const manager = AppDataSource.manager;
@@ -11,10 +12,11 @@ export const listPlaces = async (req: Request, res: Response) => {
         const builder = manager
             .getRepository(Places)
             .createQueryBuilder('places')
+            .leftJoinAndSelect('places.schedules', 'places_schedules')
             .leftJoinAndSelect('places.address', 'places_address')
             .leftJoinAndSelect('places.type', 'types')
             .orderBy("places.name", 'DESC');
-
+            
         const { term, page, perPage } = req.query;
 
         if (term) {
@@ -47,7 +49,8 @@ export const createPlace = async (req: Request, res: Response) => {
             description,
             category,
             address,
-            type_id
+            type_id,
+            schedules
         } = req.body;
 
         const place = new Places();
@@ -56,6 +59,7 @@ export const createPlace = async (req: Request, res: Response) => {
         place.description = description;
         place.category = category;
         place.address = address;
+        place.schedules = schedules;
 
         const types = AppDataSource.getRepository(Types);
         const type = await types.findOneBy({id: type_id});
@@ -81,7 +85,8 @@ export const updatePlace = async (req: Request, res: Response) => {
             description,
             category,
             address,
-            type_id
+            type_id,
+            schedules
         } = req.body;
 
         const places = AppDataSource.getRepository(Places);
@@ -95,10 +100,13 @@ export const updatePlace = async (req: Request, res: Response) => {
         place.description = description;
         place.category = category;
         place.address = address;
+        place.schedules = schedules;
 
-        const types = AppDataSource.getRepository(Types);
-        const type = await types.findOneBy({id: parseInt(type_id)});
-        if (type) place.type = type_id;
+        if (type_id) {
+            const types = AppDataSource.getRepository(Types);
+            const type = await types.findOneBy({id: parseInt(type_id)});
+            if (type) place.type = type_id;
+        }
 
         await manager.save(place);
         return res.status(200).json(place);

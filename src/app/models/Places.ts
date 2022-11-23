@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PlacesAddress } from "./PlacesAddress";
+import { PlacesSchedules } from "./PlacesSchedule";
 import { Types } from "./Types";
 
 @Entity()
@@ -26,5 +27,8 @@ export class Places {
     @ManyToOne(() => Types, (type) => type.places, {nullable: true})
     @JoinColumn({name: 'typeId'})
     type: Types
+
+    @OneToMany(() => PlacesSchedules, (schedule) => schedule.place)
+    schedules: PlacesSchedules[]
     
 }
