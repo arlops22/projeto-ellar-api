@@ -23,10 +23,6 @@ export class CreatePlacesTable1667245684421 implements MigrationInterface {
                         type: 'varchar'
                     },
                     {
-                        name: 'category',
-                        type: 'varchar'
-                    },
-                    {
                         name: 'addressId',
                         type: 'int'
                     }
@@ -71,11 +67,11 @@ export class CreatePlacesTable1667245684421 implements MigrationInterface {
                     },
                     {
                         name: 'latitude',
-                        type: 'float4'
+                        type: 'float8'
                     },
                     {
                         name: 'longitude',
-                        type: 'float4'
+                        type: 'float8'
                     }
                 ]
             })

@@ -1,4 +1,5 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Caracterizations } from "./Caracterizations";
 import { PlacesAddress } from "./PlacesAddress";
 import { PlacesSchedules } from "./PlacesSchedule";
 import { Types } from "./Types";
@@ -15,9 +16,6 @@ export class Places {
     @Column()
     description: string
 
-    @Column()
-    category: string
-
     @OneToOne(() => PlacesAddress, (place_address) => place_address.place, {
         cascade: true
     })
@@ -30,5 +28,8 @@ export class Places {
 
     @OneToMany(() => PlacesSchedules, (schedule) => schedule.place)
     schedules: PlacesSchedules[]
-    
+
+    @ManyToMany(() => Caracterizations)
+    @JoinTable({name: 'places_caracterizations'})
+    caracterizations: Caracterizations[]
 }

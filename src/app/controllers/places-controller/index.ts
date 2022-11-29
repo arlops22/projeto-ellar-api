@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 
 import { AppDataSource } from "../../../database";
 import { Places } from "../../models/Places";
-import { PlacesSchedules } from "../../models/PlacesSchedule";
 import { Types } from "../../models/Types";
 
 const manager = AppDataSource.manager;
@@ -12,6 +11,7 @@ export const listPlaces = async (req: Request, res: Response) => {
         const builder = manager
             .getRepository(Places)
             .createQueryBuilder('places')
+            .leftJoinAndSelect('places.caracterizations', 'caracterizations')
             .leftJoinAndSelect('places.schedules', 'places_schedules')
             .leftJoinAndSelect('places.address', 'places_address')
             .leftJoinAndSelect('places.type', 'types')
@@ -47,19 +47,19 @@ export const createPlace = async (req: Request, res: Response) => {
         const { 
             name, 
             description,
-            category,
             address,
             type_id,
-            schedules
+            schedules,
+            caracterizations
         } = req.body;
 
         const place = new Places();
 
         place.name = name;
         place.description = description;
-        place.category = category;
         place.address = address;
         place.schedules = schedules;
+        place.caracterizations = caracterizations;
 
         const types = AppDataSource.getRepository(Types);
         const type = await types.findOneBy({id: type_id});
@@ -83,10 +83,10 @@ export const updatePlace = async (req: Request, res: Response) => {
         const { 
             name, 
             description,
-            category,
             address,
             type_id,
-            schedules
+            schedules,
+            caracterizations
         } = req.body;
 
         const places = AppDataSource.getRepository(Places);
@@ -98,9 +98,9 @@ export const updatePlace = async (req: Request, res: Response) => {
 
         place.name = name;
         place.description = description;
-        place.category = category;
         place.address = address;
         place.schedules = schedules;
+        place.caracterizations = caracterizations;
 
         if (type_id) {
             const types = AppDataSource.getRepository(Types);
