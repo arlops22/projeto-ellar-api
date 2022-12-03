@@ -61,7 +61,7 @@ export const createPlace = async (req: Request, res: Response) => {
         place.description = description;
         place.address = address;
         place.schedules = schedules;
-        // place.caracterizations = caracterizations;
+        place.caracterizations = caracterizations;
 
         const types = AppDataSource.getRepository(Type);
         const type = await types.findOneBy({id: type_id});
@@ -84,8 +84,6 @@ const handleCreatePlaceSchedule = async (schedules: PlaceSchedule[], place: Plac
         new_schedule.opening_time = schedule.opening_time;
         new_schedule.close_time = schedule.close_time;
         new_schedule.place = place;
-
-        console.log('new_schedule', new_schedule)
     
         manager.save(new_schedule);
     }));
@@ -136,7 +134,7 @@ export const updatePlace = async (req: Request, res: Response) => {
         place.name = name;
         place.description = description;
         place.address = address;
-        // place.caracterizations = caracterizations;
+        place.caracterizations = caracterizations;
 
         if (type_id) {
             const types = AppDataSource.getRepository(Type);
@@ -154,6 +152,8 @@ export const updatePlace = async (req: Request, res: Response) => {
         await handleUpdatePlaceSchedule(schedules_for_update);
         await handleDeletePlaceSchedule(schedules_for_delete);
         await handleCreatePlaceSchedule(schedules_for_create, place);
+
+        console.log('place', place.caracterizations)
 
         await manager.save(place);
 
