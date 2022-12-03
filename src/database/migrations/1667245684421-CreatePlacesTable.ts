@@ -5,7 +5,7 @@ export class CreatePlacesTable1667245684421 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: 'places',
+                name: 'place',
                 columns: [
                     {
                         name: 'id',
@@ -23,7 +23,7 @@ export class CreatePlacesTable1667245684421 implements MigrationInterface {
                         type: 'varchar'
                     },
                     {
-                        name: 'addressId',
+                        name: 'place_addressId',
                         type: 'int'
                     }
                 ]
@@ -32,7 +32,7 @@ export class CreatePlacesTable1667245684421 implements MigrationInterface {
 
         await queryRunner.createTable(
             new Table({
-                name: 'places_address',
+                name: 'place_address',
                 columns: [
                     {
                         name: 'id',
@@ -78,26 +78,26 @@ export class CreatePlacesTable1667245684421 implements MigrationInterface {
         );
 
         await queryRunner.createForeignKey(
-            "places",
+            "place",
             new TableForeignKey({
-                columnNames: ["addressId"],
+                columnNames: ["place_addressId"],
                 referencedColumnNames: ["id"],
-                referencedTableName: "places_address",
+                referencedTableName: "place_address",
                 onDelete: "CASCADE",
             }),
         )
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        const table = await queryRunner.getTable("places")
+        const table = await queryRunner.getTable("place")
         const foreignKey = table?.foreignKeys.find(
-            (fk) => fk.columnNames.indexOf("addressId") !== -1,
+            (fk) => fk.columnNames.indexOf("place_addressId") !== -1,
         )
         if (foreignKey) {
-            await queryRunner.dropForeignKey("places", foreignKey)
+            await queryRunner.dropForeignKey("place", foreignKey)
         }
-        await queryRunner.dropTable('places_address');
-        await queryRunner.dropTable('places');
+        await queryRunner.dropTable('place_address');
+        await queryRunner.dropTable('place');
     }
 
 }

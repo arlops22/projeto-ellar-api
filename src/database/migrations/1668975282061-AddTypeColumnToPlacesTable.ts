@@ -5,7 +5,7 @@ export class AddTypeColumnToPlacesTable1668975282061 implements MigrationInterfa
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: 'types',
+                name: 'type',
                 columns: [
                     {
                         name: 'id',
@@ -23,7 +23,7 @@ export class AddTypeColumnToPlacesTable1668975282061 implements MigrationInterfa
         );
 
         await queryRunner.addColumn(
-            "places",
+            "place",
             new TableColumn({
                 name: 'typeId',
                 type: 'int',
@@ -32,25 +32,25 @@ export class AddTypeColumnToPlacesTable1668975282061 implements MigrationInterfa
         );
 
         await queryRunner.createForeignKey(
-            "places",
+            "place",
             new TableForeignKey({
                 columnNames: ["typeId"],
                 referencedColumnNames: ["id"],
-                referencedTableName: "types",
+                referencedTableName: "type",
                 onDelete: "CASCADE",
             }),
         );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        const table = await queryRunner.getTable("places")
+        const table = await queryRunner.getTable("place")
         const foreignKey = table?.foreignKeys.find(
             (fk) => fk.columnNames.indexOf("typeId") !== -1,
         )
         if (foreignKey) {
-            await queryRunner.dropForeignKey("places", foreignKey)
+            await queryRunner.dropForeignKey("place", foreignKey)
         }
-        await queryRunner.dropTable('types');
+        await queryRunner.dropTable('type');
     }
 
 }

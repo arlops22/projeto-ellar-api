@@ -1,11 +1,11 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Places } from "./Places";
+import { Place } from "./Place";
 
 @Entity()
-export class PlacesAddress {
+export class PlaceAddress {
 
     @PrimaryGeneratedColumn()
-    id!: number
+    id: number
 
     @Column()
     cep: string
@@ -31,6 +31,6 @@ export class PlacesAddress {
     @Column()
     longitude: number
     
-    @OneToOne(() => Places, (place) => place.address)
-    place: Places
+    @OneToOne(() => Place, (place) => place.address)
+    place: Place
 }

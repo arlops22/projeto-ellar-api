@@ -1,21 +1,21 @@
 import { Request, Response } from "express";
 
 import { AppDataSource } from "../../../database";
-import { Types } from "../../models/Types";
+import { Type } from "../../models/Type";
 
 const manager = AppDataSource.manager;
 
 export const listTypes = async (req: Request, res: Response) => {
     try {
         const builder = manager
-            .getRepository(Types)
-            .createQueryBuilder('types')
-            .orderBy("types.name", 'DESC');
+            .getRepository(Type)
+            .createQueryBuilder('type')
+            .orderBy("type.name", 'DESC');
 
         const { term, page, perPage } = req.query;
 
         if (term) {
-            builder.where('LOWER(types.name) LIKE :term', {term: `%${term.toString().toLowerCase()}%`})
+            builder.where('LOWER(type.name) LIKE :term', {term: `%${term.toString().toLowerCase()}%`})
         }
         
         const current_page = page ? parseInt(page.toString()) : 1;
@@ -41,7 +41,7 @@ export const createType = async (req: Request, res: Response) => {
     try {
         const { name } = req.body;
 
-        const type = new Types();
+        const type = new Type();
 
         type.name = name;
 
@@ -59,7 +59,7 @@ export const updateType = async (req: Request, res: Response) => {
         const { id } = req.params;
         const { name } = req.body;
 
-        const types = AppDataSource.getRepository(Types);
+        const types = AppDataSource.getRepository(Type);
         const type = await types.findOneBy({id: parseInt(id)});
 
         if (!type) {
@@ -80,7 +80,7 @@ export const deleteType = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const types = AppDataSource.getRepository(Types);
+        const types = AppDataSource.getRepository(Type);
         const type = await types.findOneBy({id: parseInt(id)});
 
         if (!type) {

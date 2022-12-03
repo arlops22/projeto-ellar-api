@@ -5,7 +5,7 @@ export class CreateTablePlacesSchedules1669154680751 implements MigrationInterfa
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: 'places_schedules',
+                name: 'place_schedule',
                 columns: [
                     {
                         name: 'id',
@@ -15,15 +15,15 @@ export class CreateTablePlacesSchedules1669154680751 implements MigrationInterfa
                         generationStrategy: 'increment'
                     },
                     {
-                        name: 'weekDate',
+                        name: 'week_date',
                         type: 'int'
                     },
                     {
-                        name: 'openingTime',
+                        name: 'opening_time',
                         type: 'varchar'
                     },
                     {
-                        name: 'closeTime',
+                        name: 'close_time',
                         type: 'varchar'
                     },
                     {
@@ -35,25 +35,25 @@ export class CreateTablePlacesSchedules1669154680751 implements MigrationInterfa
         );
 
         await queryRunner.createForeignKey(
-            "places_schedules",
+            "place_schedule",
             new TableForeignKey({
                 columnNames: ["placeId"],
                 referencedColumnNames: ["id"],
-                referencedTableName: "places",
+                referencedTableName: "place",
                 onDelete: "CASCADE",
             }),
         );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        const table = await queryRunner.getTable("places_schedules")
+        const table = await queryRunner.getTable("place_schedule")
         const foreignKey = table?.foreignKeys.find(
             (fk) => fk.columnNames.indexOf("placeId") !== -1,
         )
         if (foreignKey) {
-            await queryRunner.dropForeignKey("places_schedules", foreignKey)
+            await queryRunner.dropForeignKey("place_schedule", foreignKey)
         }
-        await queryRunner.dropTable('places_schedules');
+        await queryRunner.dropTable('place_schedule');
     }
 
 }

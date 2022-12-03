@@ -1,21 +1,21 @@
 import { Request, Response } from "express";
 
 import { AppDataSource } from "../../../database";
-import { Caracterizations } from "../../models/Caracterizations";
+import { Caracterization } from "../../models/Caracterization";
 
 const manager = AppDataSource.manager;
 
 export const listCaracterizations = async (req: Request, res: Response) => {
     try {
         const builder = manager
-            .getRepository(Caracterizations)
-            .createQueryBuilder('caracterizations')
-            .orderBy("caracterizations.name", 'DESC');
+            .getRepository(Caracterization)
+            .createQueryBuilder('caracterization')
+            .orderBy("caracterization.name", 'DESC');
 
         const { term, page, perPage } = req.query;
 
         if (term) {
-            builder.where('LOWER(caracterizations.name) LIKE :term', {term: `%${term.toString().toLowerCase()}%`})
+            builder.where('LOWER(caracterization.name) LIKE :term', {term: `%${term.toString().toLowerCase()}%`})
         }
         
         const current_page = page ? parseInt(page.toString()) : 1;
@@ -40,13 +40,13 @@ export const createCaracterization = async (req: Request, res: Response) => {
     try {
         const { name } = req.body;
 
-        const caracterizations = new Caracterizations();
+        const caracterization = new Caracterization();
 
-        caracterizations.name = name;
+        caracterization.name = name;
 
-        await manager.save(caracterizations);
+        await manager.save(caracterization);
 
-        return res.status(200).json(caracterizations);
+        return res.status(200).json(caracterization);
 
     } catch (error) {
         return res.status(500).json(error);
@@ -58,7 +58,7 @@ export const updateCaracterization = async (req: Request, res: Response) => {
         const { id } = req.params;
         const { name } = req.body;
 
-        const caracterizations = AppDataSource.getRepository(Caracterizations);
+        const caracterizations = AppDataSource.getRepository(Caracterization);
         const caracterization = await caracterizations.findOneBy({id: parseInt(id)});
 
         if (!caracterization) {
@@ -79,7 +79,7 @@ export const deleteCaracterization = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const caracterizations = AppDataSource.getRepository(Caracterizations);
+        const caracterizations = AppDataSource.getRepository(Caracterization);
         const caracterization = await caracterizations.findOneBy({id: parseInt(id)});
 
         if (!caracterization) {
