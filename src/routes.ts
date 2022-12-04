@@ -19,16 +19,24 @@ import {
     listTypes, 
     updateType
 } from "./app/controllers/types-controller";
+import { 
+    login,
+    register 
+} from "./app/controllers/user-controller";
 
 import uploads from "./app/config/uploads";
+import authMiddleware from "./app/middlewares/auth";
 
 const routes = express.Router();
+
+routes.post('/register', register);
+routes.post('/login', login);
 
 routes.get('/places', listPlaces);
 routes.post('/place', createPlace);
 routes.patch('/place/:id', updatePlace);
 routes.put('/place/:id', uploads.single('image'), uploadImage);
-routes.delete('/place/:id', deletePlace);
+routes.delete('/place/:id', authMiddleware, deletePlace);
 
 routes.get('/types', listTypes);
 routes.post('/type', createType);
