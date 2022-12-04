@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../../../database";
 
 import { Place } from "../../models/Place";
+import { PlaceImage } from "../../models/PlaceImage";
 import { PlaceSchedule } from "../../models/PlaceSchedule";
 import { Type } from "../../models/Type";
 
@@ -16,6 +17,7 @@ export const listPlaces = async (req: Request, res: Response) => {
             .leftJoinAndSelect('place.address', 'place_address')
             .leftJoinAndSelect('place.type', 'type')
             .leftJoinAndSelect('place.schedules', 'place_schedule')
+            .leftJoinAndSelect('place.images', 'place_image')
             .leftJoinAndSelect('place.caracterizations', 'caracterization')
             .orderBy("place.name", 'DESC');
             
@@ -153,12 +155,38 @@ export const updatePlace = async (req: Request, res: Response) => {
         await handleDeletePlaceSchedule(schedules_for_delete);
         await handleCreatePlaceSchedule(schedules_for_create, place);
 
-        console.log('place', place.caracterizations)
-
         await manager.save(place);
 
         return res.status(200).json(place);
 
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+}
+
+export const uploadImage = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        const places = AppDataSource.getRepository(Place);
+        const place = await places.findOneBy({id: parseInt(id)});
+
+        if (!place) {
+            return res.status(404).json({error: {message: "Local não encontrado!"}});
+        }
+
+        if (!req.file) {
+            return res.status(404).json({error: {message: "Imagem não encontrada!"}})
+        }
+        
+        const image = new PlaceImage();
+    
+        image.path = req.file.path;
+        image.place = place;
+    
+        manager.save(image);
+
+        return res.status(200).json({place, file: req.file});
     } catch (error) {
         return res.status(500).json(error);
     }

@@ -10,7 +10,8 @@ import {
     listPlaces, 
     createPlace, 
     updatePlace,
-    deletePlace
+    deletePlace,
+    uploadImage
 } from "./app/controllers/places-controller";
 import { 
     createType, 
@@ -19,11 +20,14 @@ import {
     updateType
 } from "./app/controllers/types-controller";
 
+import uploads from "./app/config/uploads";
+
 const routes = express.Router();
 
 routes.get('/places', listPlaces);
 routes.post('/place', createPlace);
 routes.patch('/place/:id', updatePlace);
+routes.put('/place/:id', uploads.single('image'), uploadImage);
 routes.delete('/place/:id', deletePlace);
 
 routes.get('/types', listTypes);
