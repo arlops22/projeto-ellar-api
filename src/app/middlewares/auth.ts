@@ -12,7 +12,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const { authorization } = req.headers;
 
     if (!authorization) {
-        return res.sendStatus(401);
+        return res.status(401).json({ error: { message: 'Não autorizado!!' } })
     }
 
     const token = authorization.replace('Bearer', '').trim();
@@ -21,7 +21,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
         const data = jwt.verify(token, 'secret');
 
         if (!data) {
-            return res.sendStatus(401);
+            return res.status(401).json({ error: { message: 'Não autorizado!!' } })
         }
 
         // const { id } = data as TokenPayload;
@@ -29,7 +29,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
         
         return next();
     } catch (error) {
-        return res.sendStatus(401);
+        return res.status(401).json({ error: { message: 'Não autorizado!!' } })
     }
 }
 

@@ -47,13 +47,13 @@ export const login = async (req: Request, res: Response) => {
         const user = await users.findOne({where: { email }});
 
         if (!user) {
-            return res.sendStatus(401);
+            return res.status(401).json({ error: { message: 'Não autorizado!!' } });
         }
 
         const is_valid_password = await bcrypt.compare(password, user.password);
 
         if (!is_valid_password) {
-            return res.sendStatus(401);
+            return res.status(401).json({ error: { message: 'Não autorizado!!' } });
         }
 
         const token = jwt.sign({ id: user.id }, 'secret', {expiresIn: '1d'});

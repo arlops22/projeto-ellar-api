@@ -17,6 +17,9 @@ export class PlaceAddress {
     complement: string
 
     @Column()
+    neighborhood: string
+
+    @Column()
     number: string
 
     @Column()

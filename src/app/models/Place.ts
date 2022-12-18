@@ -1,8 +1,9 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+
 import { Caracterization } from "./Caracterization";
 import { PlaceAddress } from "./PlaceAddress";
 import { PlaceImage } from "./PlaceImage";
-import { PlaceSchedule } from "./PlaceSchedule";
+import { PlaceDisponibility } from "./PlaceDisponibility";
 import { Type } from "./Type";
 
 @Entity()
@@ -27,8 +28,8 @@ export class Place {
     @JoinColumn()
     type: Type
 
-    @OneToMany(() => PlaceSchedule, (schedule) => schedule.place, {cascade: true})
-    schedules: PlaceSchedule[]
+    @OneToMany(() => PlaceDisponibility, (disponibility) => disponibility.place, {cascade: true})
+    disponibilities: PlaceDisponibility[]
 
     @OneToMany(() => PlaceImage, (image) => image.place, {cascade: true})
     images: PlaceImage[]

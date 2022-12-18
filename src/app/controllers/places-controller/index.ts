@@ -4,7 +4,7 @@ import { AppDataSource } from "../../../database";
 
 import { Place } from "../../models/Place";
 import { PlaceImage } from "../../models/PlaceImage";
-import { PlaceSchedule } from "../../models/PlaceSchedule";
+import { PlaceDisponibility } from "../../models/PlaceDisponibility";
 import { Type } from "../../models/Type";
 
 const manager = AppDataSource.manager;
@@ -16,7 +16,7 @@ export const listPlaces = async (req: Request, res: Response) => {
             .createQueryBuilder('place')
             .leftJoinAndSelect('place.address', 'place_address')
             .leftJoinAndSelect('place.type', 'type')
-            .leftJoinAndSelect('place.schedules', 'place_schedule')
+            .leftJoinAndSelect('place.disponibilities', 'place_disponibility')
             .leftJoinAndSelect('place.images', 'place_image')
             .leftJoinAndSelect('place.caracterizations', 'caracterization')
             .orderBy("place.name", 'DESC');
@@ -53,16 +53,18 @@ export const createPlace = async (req: Request, res: Response) => {
             description,
             address,
             type_id,
-            schedules,
+            disponibilities,
             caracterizations
         } = req.body;
+
+        // console.log('req.body', req.body)
 
         const place = new Place();
 
         place.name = name;
         place.description = description;
         place.address = address;
-        place.schedules = schedules;
+        place.disponibilities = disponibilities;
         place.caracterizations = caracterizations;
 
         const types = AppDataSource.getRepository(Type);
@@ -74,42 +76,43 @@ export const createPlace = async (req: Request, res: Response) => {
         return res.status(200).json(place);
 
     } catch (error) {
+        console.log('error', error)
         return res.status(500).json(error);
     }
 }
 
-const handleCreatePlaceSchedule = async (schedules: PlaceSchedule[], place: Place) => {
-    await Promise.all(schedules.map((schedule: PlaceSchedule) => {
-        const new_schedule = new PlaceSchedule();
+const handleCreatePlaceDisponibility = async (disponibilities: PlaceDisponibility[], place: Place) => {
+    await Promise.all(disponibilities.map((disponibility: PlaceDisponibility) => {
+        const new_disponibility = new PlaceDisponibility();
     
-        new_schedule.week_date = schedule.week_date;
-        new_schedule.opening_time = schedule.opening_time;
-        new_schedule.close_time = schedule.close_time;
-        new_schedule.place = place;
+        new_disponibility.week_date = disponibility.week_date;
+        new_disponibility.opening_time = disponibility.opening_time;
+        new_disponibility.close_time = disponibility.close_time;
+        new_disponibility.place = place;
     
-        manager.save(new_schedule);
+        manager.save(new_disponibility);
     }));
 }
 
-const handleDeletePlaceSchedule = async (schedules: PlaceSchedule[]) => {
-    await Promise.all(schedules.map(async (schedule: PlaceSchedule) => {
-        const place_schedules = AppDataSource.getRepository(PlaceSchedule);
-        const place_schedule = await place_schedules.findOneBy({id: schedule.id});
+const handleDeletePlaceDisponibility = async (disponibilities: PlaceDisponibility[]) => {
+    await Promise.all(disponibilities.map(async (disponibility: PlaceDisponibility) => {
+        const place_disponibilities = AppDataSource.getRepository(PlaceDisponibility);
+        const place_disponibility = await place_disponibilities.findOneBy({id: disponibility.id});
     
-        if (place_schedule) await place_schedules.remove(place_schedule);
+        if (place_disponibility) await place_disponibilities.remove(place_disponibility);
     }));
 }
 
-const handleUpdatePlaceSchedule = async (schedules: PlaceSchedule[]) => {
-    await Promise.all(schedules.map(async (schedule: PlaceSchedule) => {
-        const place_schedules = AppDataSource.getRepository(PlaceSchedule);
-        const place_schedule = await place_schedules.findOneBy({id: schedule.id});
-        if (place_schedule) {
-            place_schedule.week_date = schedule.week_date;
-            place_schedule.opening_time = schedule.opening_time;
-            place_schedule.close_time = schedule.close_time;
+const handleUpdatePlaceDisponibility = async (disponibilities: PlaceDisponibility[]) => {
+    await Promise.all(disponibilities.map(async (disponibility: PlaceDisponibility) => {
+        const place_disponibilities = AppDataSource.getRepository(PlaceDisponibility);
+        const place_disponibility = await place_disponibilities.findOneBy({id: disponibility.id});
+        if (place_disponibility) {
+            place_disponibility.week_date = disponibility.week_date;
+            place_disponibility.opening_time = disponibility.opening_time;
+            place_disponibility.close_time = disponibility.close_time;
 
-            await manager.save(place_schedule);
+            await manager.save(place_disponibility);
         }
     }));
 }
@@ -122,7 +125,7 @@ export const updatePlace = async (req: Request, res: Response) => {
             description,
             address,
             type_id,
-            schedules,
+            disponibilities,
             caracterizations
         } = req.body;
 
@@ -144,16 +147,16 @@ export const updatePlace = async (req: Request, res: Response) => {
             if (type) place.type = type;
         }
 
-        const place_schedule_repo = AppDataSource.getRepository(PlaceSchedule);
-        const place_schedules = await place_schedule_repo.find();
+        const place_disponibility_repo = AppDataSource.getRepository(PlaceDisponibility);
+        const place_disponibilities = await place_disponibility_repo.find();
         
-        const schedules_for_update = schedules.filter((schedule: PlaceSchedule) => place_schedules.find((place_schedule: PlaceSchedule) => place_schedule.id === schedule.id) !== undefined);
-        const schedules_for_delete = place_schedules.filter((place_schedule: PlaceSchedule) => !schedules.find((schedule: PlaceSchedule) => place_schedule.id === schedule.id));
-        const schedules_for_create = schedules.filter((schedule: PlaceSchedule) => schedule.id === undefined);
+        const disponibilities_for_update = disponibilities.filter((disponibility: PlaceDisponibility) => place_disponibilities.find((place_disponibility: PlaceDisponibility) => place_disponibility.id === disponibility.id) !== undefined);
+        const disponibilities_for_delete = place_disponibilities.filter((place_disponibility: PlaceDisponibility) => !disponibilities.find((disponibility: PlaceDisponibility) => place_disponibility.id === disponibility.id));
+        const disponibilities_for_create = disponibilities.filter((disponibility: PlaceDisponibility) => disponibility.id === undefined);
 
-        await handleUpdatePlaceSchedule(schedules_for_update);
-        await handleDeletePlaceSchedule(schedules_for_delete);
-        await handleCreatePlaceSchedule(schedules_for_create, place);
+        await handleUpdatePlaceDisponibility(disponibilities_for_update);
+        await handleDeletePlaceDisponibility(disponibilities_for_delete);
+        await handleCreatePlaceDisponibility(disponibilities_for_create, place);
 
         await manager.save(place);
 

@@ -10,7 +10,7 @@ export class PlaceImage {
     @Column()
     path: string
 
-    @ManyToOne(() => Place, (place) => place.schedules)
+    @ManyToOne(() => Place, (place) => place.images)
     @JoinColumn()
     place: Place
     

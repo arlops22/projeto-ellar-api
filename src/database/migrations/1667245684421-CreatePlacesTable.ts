@@ -54,6 +54,10 @@ export class CreatePlacesTable1667245684421 implements MigrationInterface {
                         type: 'varchar'
                     },
                     {
+                        name: 'neighborhood',
+                        type: 'varchar'
+                    },
+                    {
                         name: 'number',
                         type: 'varchar'
                     },

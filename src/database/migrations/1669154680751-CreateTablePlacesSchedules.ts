@@ -1,11 +1,11 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey } from "typeorm"
 
-export class CreateTablePlacesSchedules1669154680751 implements MigrationInterface {
+export class CreateTablePlacesDisponibilites1669154680751 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: 'place_schedule',
+                name: 'place_disponibility',
                 columns: [
                     {
                         name: 'id',
@@ -35,7 +35,7 @@ export class CreateTablePlacesSchedules1669154680751 implements MigrationInterfa
         );
 
         await queryRunner.createForeignKey(
-            "place_schedule",
+            "place_disponibility",
             new TableForeignKey({
                 columnNames: ["placeId"],
                 referencedColumnNames: ["id"],
@@ -46,14 +46,14 @@ export class CreateTablePlacesSchedules1669154680751 implements MigrationInterfa
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        const table = await queryRunner.getTable("place_schedule")
+        const table = await queryRunner.getTable("place_disponibility")
         const foreignKey = table?.foreignKeys.find(
             (fk) => fk.columnNames.indexOf("placeId") !== -1,
         )
         if (foreignKey) {
-            await queryRunner.dropForeignKey("place_schedule", foreignKey)
+            await queryRunner.dropForeignKey("place_disponibility", foreignKey)
         }
-        await queryRunner.dropTable('place_schedule');
+        await queryRunner.dropTable('place_disponibility');
     }
 
 }

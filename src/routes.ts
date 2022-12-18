@@ -32,20 +32,20 @@ const routes = express.Router();
 routes.post('/register', register);
 routes.post('/login', login);
 
-routes.get('/places', listPlaces);
-routes.post('/place', createPlace);
-routes.patch('/place/:id', updatePlace);
-routes.put('/place/:id', uploads.single('image'), uploadImage);
+routes.get('/places', authMiddleware, listPlaces);
+routes.post('/place', authMiddleware, createPlace);
+routes.patch('/place/:id', authMiddleware, updatePlace);
+routes.put('/place/:id', authMiddleware, uploads.single('image'), uploadImage);
 routes.delete('/place/:id', authMiddleware, deletePlace);
 
-routes.get('/types', listTypes);
-routes.post('/type', createType);
-routes.patch('/type/:id', updateType);
-routes.delete('/type/:id', deleteType);
+routes.get('/types', authMiddleware, listTypes);
+routes.post('/type', authMiddleware, createType);
+routes.patch('/type/:id', authMiddleware, updateType);
+routes.delete('/type/:id', authMiddleware, deleteType);
 
-routes.get('/caracterizations', listCaracterizations);
-routes.post('/caracterization', createCaracterization);
-routes.patch('/caracterization/:id', updateCaracterization);
-routes.delete('/caracterization/:id', deleteCaracterization);
+routes.get('/caracterizations', authMiddleware, listCaracterizations);
+routes.post('/caracterization', authMiddleware, createCaracterization);
+routes.patch('/caracterization/:id', authMiddleware, updateCaracterization);
+routes.delete('/caracterization/:id', authMiddleware, deleteCaracterization);
 
 export default routes;

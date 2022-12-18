@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "t
 import { Place } from "./Place";
 
 @Entity()
-export class PlaceSchedule {
+export class PlaceDisponibility {
 
     @PrimaryGeneratedColumn()
     id: number
@@ -16,7 +16,7 @@ export class PlaceSchedule {
     @Column()
     close_time: string
 
-    @ManyToOne(() => Place, (place) => place.schedules)
+    @ManyToOne(() => Place, (place) => place.disponibilities)
     @JoinColumn()
     place: Place
     
