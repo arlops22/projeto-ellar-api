@@ -10,4 +10,4 @@ app.use(express.json());
 app.use(cors());
 app.use('/api', routes);
  
-app.listen(8000, () => console.log('App listened in PORT 8000!'));
+app.listen(3333, () => console.log('App listened in PORT 8000!'));
