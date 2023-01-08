@@ -146,19 +146,20 @@ export const updatePlace = async (req: Request, res: Response) => {
             const type = await types.findOneBy({id: parseInt(type_id)});
             if (type) place.type = type;
         }
+        if (disponibilities) {
+            const place_disponibility_repo = AppDataSource.getRepository(PlaceDisponibility);
+            const place_disponibilities = await place_disponibility_repo.find();
+            
+            const disponibilities_for_update = disponibilities.filter((disponibility: PlaceDisponibility) => place_disponibilities.find((place_disponibility: PlaceDisponibility) => place_disponibility.id === disponibility.id) !== undefined);
+            const disponibilities_for_delete = place_disponibilities.filter((place_disponibility: PlaceDisponibility) => !disponibilities.find((disponibility: PlaceDisponibility) => place_disponibility.id === disponibility.id));
+            const disponibilities_for_create = disponibilities.filter((disponibility: PlaceDisponibility) => disponibility.id === undefined);
+    
+            await handleUpdatePlaceDisponibility(disponibilities_for_update);
+            await handleDeletePlaceDisponibility(disponibilities_for_delete);
+            await handleCreatePlaceDisponibility(disponibilities_for_create, place);
+        }
 
-        const place_disponibility_repo = AppDataSource.getRepository(PlaceDisponibility);
-        const place_disponibilities = await place_disponibility_repo.find();
-        
-        const disponibilities_for_update = disponibilities.filter((disponibility: PlaceDisponibility) => place_disponibilities.find((place_disponibility: PlaceDisponibility) => place_disponibility.id === disponibility.id) !== undefined);
-        const disponibilities_for_delete = place_disponibilities.filter((place_disponibility: PlaceDisponibility) => !disponibilities.find((disponibility: PlaceDisponibility) => place_disponibility.id === disponibility.id));
-        const disponibilities_for_create = disponibilities.filter((disponibility: PlaceDisponibility) => disponibility.id === undefined);
-
-        await handleUpdatePlaceDisponibility(disponibilities_for_update);
-        await handleDeletePlaceDisponibility(disponibilities_for_delete);
-        await handleCreatePlaceDisponibility(disponibilities_for_create, place);
-
-        await manager.save(place);
+        await manager.save(place, {reload: true});
 
         return res.status(200).json(place);
 

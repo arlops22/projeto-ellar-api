@@ -11,10 +11,14 @@ export const AppDataSource = new DataSource({
     migrationsRun: false,
     // synchronize: true,
     entities: [
-        "src/app/models/*.{js,ts}"
+        process.env.NODE_ENV === "prod"
+        ? "build/app/models/*.{js,ts}"
+        : "src/app/models/*.{js,ts}"
     ],
     migrations: [
-        "src/database/migrations/*.{js,ts}"
+        process.env.NODE_ENV === "prod"
+        ? "build/database/migrations/*.{js,ts}"
+        : "src/database/migrations/*.{js,ts}"
     ]
 })
 
