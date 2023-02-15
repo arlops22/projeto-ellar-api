@@ -19,7 +19,8 @@ export class Place {
     description: string
 
     @OneToOne(() => PlaceAddress, (place_address) => place_address.place, {
-        cascade: true
+        cascade: true,
+        nullable: true
     })
     @JoinColumn({name: 'place_addressId'})
     address: PlaceAddress

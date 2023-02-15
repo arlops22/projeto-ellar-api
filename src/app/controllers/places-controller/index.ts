@@ -63,9 +63,12 @@ export const createPlace = async (req: Request, res: Response) => {
 
         place.name = name;
         place.description = description;
-        place.address = address;
         place.disponibilities = disponibilities;
         place.caracterizations = caracterizations;
+
+        if (address) {
+            place.address = address;
+        }
 
         const types = AppDataSource.getRepository(Type);
         const type = await types.findOneBy({id: type_id});
@@ -138,8 +141,11 @@ export const updatePlace = async (req: Request, res: Response) => {
 
         place.name = name;
         place.description = description;
-        place.address = address;
         place.caracterizations = caracterizations;
+
+        if (address) {
+            place.address = address;
+        }
 
         if (type_id) {
             const types = AppDataSource.getRepository(Type);

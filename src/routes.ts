@@ -35,7 +35,7 @@ routes.post('/login', login);
 routes.get('/places', authMiddleware, listPlaces);
 routes.post('/place', authMiddleware, createPlace);
 routes.patch('/place/:id', authMiddleware, updatePlace);
-routes.put('/place/:id', authMiddleware, uploads.single('image'), uploadImage);
+routes.put('/place/:id/upload_image', authMiddleware, uploads.single('image'), uploadImage);
 routes.delete('/place/:id', authMiddleware, deletePlace);
 
 routes.get('/types', authMiddleware, listTypes);
