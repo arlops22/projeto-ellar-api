@@ -102,7 +102,9 @@ const handleDeletePlaceDisponibility = async (disponibilities: PlaceDisponibilit
         const place_disponibilities = AppDataSource.getRepository(PlaceDisponibility);
         const place_disponibility = await place_disponibilities.findOneBy({id: disponibility.id});
     
-        if (place_disponibility) await place_disponibilities.remove(place_disponibility);
+        if (place_disponibility) {
+            await place_disponibilities.remove(place_disponibility);
+        }
     }));
 }
 
@@ -114,7 +116,6 @@ const handleUpdatePlaceDisponibility = async (disponibilities: PlaceDisponibilit
             place_disponibility.week_date = disponibility.week_date;
             place_disponibility.opening_time = disponibility.opening_time;
             place_disponibility.close_time = disponibility.close_time;
-
             await manager.save(place_disponibility);
         }
     }));
@@ -133,19 +134,28 @@ export const updatePlace = async (req: Request, res: Response) => {
         } = req.body;
 
         const places = AppDataSource.getRepository(Place);
-        const place = await places.findOneBy({id: parseInt(id)});
+        const place = await places.findOne({
+            where: {
+                id: parseInt(id)
+            },
+            relations: {
+                address: true,
+                type: true,
+                disponibilities: true,
+                images: true,
+                caracterizations: true
+            }
+        })
 
         if (!place) {
             return res.status(404).json({error: {message: "Local não encontrado!"}});
         } 
 
-        place.name = name;
-        place.description = description;
-        place.caracterizations = caracterizations;
+        if (name) place.name = name;
+        if (description) place.description = description;
 
-        if (address) {
-            place.address = address;
-        }
+        if (address) place.address = address;
+        if (caracterizations) place.caracterizations = caracterizations;
 
         if (type_id) {
             const types = AppDataSource.getRepository(Type);
@@ -159,13 +169,15 @@ export const updatePlace = async (req: Request, res: Response) => {
             const disponibilities_for_update = disponibilities.filter((disponibility: PlaceDisponibility) => place_disponibilities.find((place_disponibility: PlaceDisponibility) => place_disponibility.id === disponibility.id) !== undefined);
             const disponibilities_for_delete = place_disponibilities.filter((place_disponibility: PlaceDisponibility) => !disponibilities.find((disponibility: PlaceDisponibility) => place_disponibility.id === disponibility.id));
             const disponibilities_for_create = disponibilities.filter((disponibility: PlaceDisponibility) => disponibility.id === undefined);
-    
+
             await handleUpdatePlaceDisponibility(disponibilities_for_update);
             await handleDeletePlaceDisponibility(disponibilities_for_delete);
             await handleCreatePlaceDisponibility(disponibilities_for_create, place);
+            
+            place.disponibilities = disponibilities;
         }
 
-        await manager.save(place, {reload: true});
+        await manager.save(place);
 
         return res.status(200).json(place);
 
