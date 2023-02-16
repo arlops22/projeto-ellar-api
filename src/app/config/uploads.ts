@@ -1,7 +1,7 @@
 import { Request } from "express";
 import path from "path";
 import multer from "multer";
-import crypto from "crypto";
+// import crypto from "crypto";
 
 const allowedMimeFormats = [
   'image/jpeg', 
@@ -9,16 +9,18 @@ const allowedMimeFormats = [
   'image/png'
 ];
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', '..', 'uploads'));
-  },
-  filename: (req, file, cb) => {
-    const hash = crypto.randomBytes(6).toString('hex');
-    const filename = `${hash}_${file.originalname}`;
-    cb(null, filename);
-  }
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, path.join(__dirname, '..', '..', 'uploads'));
+//   },
+//   filename: (req, file, cb) => {
+//     const hash = crypto.randomBytes(6).toString('hex');
+//     const filename = `${hash}_${file.originalname}`;
+//     cb(null, filename);
+//   }
+// });
+
+const storage = multer.memoryStorage();
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: Function) => {
   const isMimeTypeValid = allowedMimeFormats.includes(file.mimetype);

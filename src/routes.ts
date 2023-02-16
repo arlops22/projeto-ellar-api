@@ -11,7 +11,8 @@ import {
     createPlace, 
     updatePlace,
     deletePlace,
-    uploadImage
+    uploadImage,
+    deleteImage
 } from "./app/controllers/places-controller";
 import { 
     createType, 
@@ -35,8 +36,10 @@ routes.post('/login', login);
 routes.get('/places', authMiddleware, listPlaces);
 routes.post('/place', authMiddleware, createPlace);
 routes.patch('/place/:id', authMiddleware, updatePlace);
-routes.put('/place/:id/upload_image', authMiddleware, uploads.single('image'), uploadImage);
 routes.delete('/place/:id', authMiddleware, deletePlace);
+
+routes.put('/place/:id/upload_image', authMiddleware, uploads.single('image'), uploadImage);
+routes.delete('/image/:id', authMiddleware, deleteImage);
 
 routes.get('/types', authMiddleware, listTypes);
 routes.post('/type', authMiddleware, createType);

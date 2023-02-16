@@ -6,6 +6,7 @@ import { Place } from "../../models/Place";
 import { PlaceImage } from "../../models/PlaceImage";
 import { PlaceDisponibility } from "../../models/PlaceDisponibility";
 import { Type } from "../../models/Type";
+import { s3Delete, s3Upload } from "../../config/s3-service";
 
 const manager = AppDataSource.manager;
 
@@ -191,7 +192,18 @@ export const uploadImage = async (req: Request, res: Response) => {
         const { id } = req.params;
 
         const places = AppDataSource.getRepository(Place);
-        const place = await places.findOneBy({id: parseInt(id)});
+        const place = await places.findOne({
+            where: {
+                id: parseInt(id)
+            },
+            relations: {
+                address: true,
+                type: true,
+                disponibilities: true,
+                images: true,
+                caracterizations: true
+            }
+        })
 
         if (!place) {
             return res.status(404).json({error: {message: "Local não encontrado!"}});
@@ -200,15 +212,39 @@ export const uploadImage = async (req: Request, res: Response) => {
         if (!req.file) {
             return res.status(404).json({error: {message: "Imagem não encontrada!"}})
         }
+
+        const s3_result = await s3Upload(req.file);
         
         const image = new PlaceImage();
     
-        image.path = req.file.path;
+        image.path = s3_result.Location;
         image.place = place;
-    
-        manager.save(image);
+        
+        await manager.save(image);
 
-        return res.status(200).json({place, file: req.file});
+        return res.status(200).json(image);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+}
+
+export const deleteImage = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        const images = AppDataSource.getRepository(PlaceImage);
+        const image = await images.findOneBy({id: parseInt(id)});
+
+        if (!image) {
+            return res.status(404).json({error: {message: "Imagem não encontrada!"}})
+        }
+
+        const s3_result = await s3Delete(image);
+        console.log('s3_result', s3_result)
+        
+        await images.remove(image);
+
+        return res.status(200).json({message: "Imagem removida com sucesso!", image});
     } catch (error) {
         return res.status(500).json(error);
     }
