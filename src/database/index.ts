@@ -1,8 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 
-console.log('env', process.env.NODE_ENV)
-
 export const AppDataSource = new DataSource({
     type: "postgres",
     host: "localhost",
@@ -31,5 +29,6 @@ AppDataSource
     .initialize()
     .then(() => {
         console.log('Database successfully connected!!')
+        console.log('env', process.env.NODE_ENV)
     })
     .catch((error) => console.log(error))
