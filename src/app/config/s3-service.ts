@@ -1,8 +1,6 @@
 import aws from 'aws-sdk';
 import crypto from "crypto";
 
-import { PlaceImage } from '../models/PlaceImage';
-
 export const s3Upload = async (file: Express.Multer.File) => {
     aws.config.update({
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -24,7 +22,7 @@ export const s3Upload = async (file: Express.Multer.File) => {
     return await s3.upload(params).promise()
 }
 
-export const s3Delete = async (image: PlaceImage) => {
+export const s3Delete = async (image: any) => {
     aws.config.update({
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,

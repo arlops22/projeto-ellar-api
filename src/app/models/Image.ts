@@ -1,12 +1,11 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class Caracterization {
+export abstract class Image {
 
     @PrimaryGeneratedColumn()
     id: number
 
     @Column()
-    name: string
-
+    path: string
 }

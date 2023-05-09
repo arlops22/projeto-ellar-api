@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 
 import { AppDataSource } from "../../../database";
-import { Caracterization } from "../../models/Caracterization";
+import { PlaceCaracterization } from "../../models/PlaceCaracterization";
 
 const manager = AppDataSource.manager;
 
 export const listCaracterizations = async (req: Request, res: Response) => {
     try {
         const builder = manager
-            .getRepository(Caracterization)
+            .getRepository(PlaceCaracterization)
             .createQueryBuilder('caracterization')
             .orderBy("caracterization.name", 'DESC');
 
@@ -40,7 +40,7 @@ export const createCaracterization = async (req: Request, res: Response) => {
     try {
         const { name } = req.body;
 
-        const caracterization = new Caracterization();
+        const caracterization = new PlaceCaracterization();
 
         caracterization.name = name;
 
@@ -58,7 +58,7 @@ export const updateCaracterization = async (req: Request, res: Response) => {
         const { id } = req.params;
         const { name } = req.body;
 
-        const caracterizations = AppDataSource.getRepository(Caracterization);
+        const caracterizations = AppDataSource.getRepository(PlaceCaracterization);
         const caracterization = await caracterizations.findOneBy({id: parseInt(id)});
 
         if (!caracterization) {
@@ -79,7 +79,7 @@ export const deleteCaracterization = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const caracterizations = AppDataSource.getRepository(Caracterization);
+        const caracterizations = AppDataSource.getRepository(PlaceCaracterization);
         const caracterization = await caracterizations.findOneBy({id: parseInt(id)});
 
         if (!caracterization) {

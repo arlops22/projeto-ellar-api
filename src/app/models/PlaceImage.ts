@@ -1,17 +1,12 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, JoinColumn, ManyToOne } from "typeorm";
+
 import { Place } from "./Place";
+import { Image } from "./Image";
 
 @Entity()
-export class PlaceImage {
-
-    @PrimaryGeneratedColumn()
-    id: number
-
-    @Column()
-    path: string
+export class PlaceImage extends Image {
 
     @ManyToOne(() => Place, (place) => place.images)
     @JoinColumn()
     place: Place
-    
 }

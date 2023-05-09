@@ -3,30 +3,28 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../../../database";
 
 import { s3Delete, s3Upload } from "../../config/s3-service";
-import { Place } from "../../models/Place";
-import { PlaceTypeImage } from "../../models/PlaceTypeImage";
-import { PlaceDisponibility } from "../../models/PlaceDisponibility";
-import { PlaceType } from "../../models/PlaceType";
-import { PlaceImage } from "../../models/PlaceImage";
+import { Event } from "../../models/Event";
+import { EventCategory } from "../../models/EventCategory";
+import { EventDisponibility } from "../../models/EventDisponibility";
+import { EventImage } from "../../models/EventImage";
 
 const manager = AppDataSource.manager;
 
-export const listPlaces = async (req: Request, res: Response) => {
+export const listEvents = async (req: Request, res: Response) => {
     try {
         const builder = manager
-            .getRepository(Place)
-            .createQueryBuilder('place')
-            .leftJoinAndSelect('place.address', 'place_address')
-            .leftJoinAndSelect('place.type', 'type')
-            .leftJoinAndSelect('place.disponibilities', 'place_disponibility')
-            .leftJoinAndSelect('place.images', 'place_image')
-            .leftJoinAndSelect('place.caracterizations', 'caracterization')
-            .orderBy("place.name", 'DESC');
+            .getRepository(Event)
+            .createQueryBuilder('event')
+            .leftJoinAndSelect('event.address', 'event_address')
+            .leftJoinAndSelect('event.category', 'event_category')
+            .leftJoinAndSelect('event.disponibilities', 'event_disponibility')
+            .leftJoinAndSelect('event.images', 'event_image')
+            .orderBy("event.name", 'DESC');
             
         const { term, page, perPage } = req.query;
 
         if (term) {
-            builder.where('LOWER(place.name) LIKE :term', {term: `%${term.toString().toLowerCase()}%`})
+            builder.where('LOWER(event.name) LIKE :term', {term: `%${term.toString().toLowerCase()}%`})
         }
         
         const current_page = page ? parseInt(page.toString()) : 1;
@@ -48,37 +46,37 @@ export const listPlaces = async (req: Request, res: Response) => {
     }
 }
 
-export const createPlace = async (req: Request, res: Response) => {
+export const createEvent = async (req: Request, res: Response) => {
     try {
         const { 
             name, 
             description,
             address,
-            type_id,
-            disponibilities,
-            caracterizations
+            category_id,
+            disponibilities
         } = req.body;
 
         // console.log('req.body', req.body)
 
-        const place = new Place();
+        const event = new Event();
 
-        place.name = name;
-        place.description = description;
-        place.disponibilities = disponibilities;
-        place.caracterizations = caracterizations;
+        event.name = name;
+        event.description = description;
 
+        if (disponibilities) {
+            event.disponibilities = disponibilities;
+        }
         if (address) {
-            place.address = address;
+            event.address = address;
         }
 
-        const types = AppDataSource.getRepository(PlaceType);
-        const type = await types.findOneBy({id: type_id});
-        if (type) place.type = type;
+        const categories = AppDataSource.getRepository(EventCategory);
+        const category = await categories.findOneBy({id: category_id});
+        if (category) event.category = category;
 
-        await manager.save(place);
+        await manager.save(event);
 
-        return res.status(200).json(place);
+        return res.status(200).json(event);
 
     } catch (error) {
         console.log('error', error)
@@ -91,53 +89,50 @@ const deleteDisponibilities = async (disponibility_ids: number[]) => {
         await manager
             .createQueryBuilder()
             .delete()
-            .from(PlaceDisponibility)
+            .from(EventDisponibility)
             .where("id = :id", { id: disponibility_id })
             .execute()
     }));
 }
 
-export const updatePlace = async (req: Request, res: Response) => {
+export const updateEvent = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { 
             name, 
             description,
             address,
-            type_id,
-            caracterizations,
+            category_id,
             disponibilities,
             disponibilities_for_delete
         } = req.body;
 
-        const places = AppDataSource.getRepository(Place);
-        const place = await places.findOne({
+        const events = AppDataSource.getRepository(Event);
+        const event = await events.findOne({
             where: {
                 id: parseInt(id)
             },
             relations: {
                 address: true,
-                type: true,
+                category: true,
                 disponibilities: true,
-                images: true,
-                caracterizations: true
+                images: true
             }
         })
 
-        if (!place) {
-            return res.status(404).json({error: {message: "Local não encontrado!"}});
+        if (!event) {
+            return res.status(404).json({error: {message: "Evento não encontrado!"}});
         } 
 
-        if (name) place.name = name;
-        if (description) place.description = description;
+        if (name) event.name = name;
+        if (description) event.description = description;
 
-        if (address) place.address = address;
-        if (caracterizations) place.caracterizations = caracterizations;
+        if (address) event.address = address;
 
-        if (type_id) {
-            const types = AppDataSource.getRepository(PlaceType);
-            const type = await types.findOneBy({id: parseInt(type_id)});
-            if (type) place.type = type;
+        if (category_id) {
+            const categories = AppDataSource.getRepository(EventCategory);
+            const category = await categories.findOneBy({id: parseInt(category_id)});
+            if (category) event.category = category;
         }
 
         if (disponibilities_for_delete?.length > 0) {
@@ -145,38 +140,37 @@ export const updatePlace = async (req: Request, res: Response) => {
         }
 
         if (disponibilities) {
-            place.disponibilities = disponibilities;
+            event.disponibilities = disponibilities;
         }
 
-        await manager.save(place);
+        await manager.save(event);
 
-        return res.status(200).json(place);
+        return res.status(200).json(event);
 
     } catch (error) {
         return res.status(500).json(error);
     }
 }
 
-export const uploadPlaceImage = async (req: Request, res: Response) => {
+export const uploadEventImage = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const places = AppDataSource.getRepository(Place);
-        const place = await places.findOne({
+        const events = AppDataSource.getRepository(Event);
+        const event = await events.findOne({
             where: {
                 id: parseInt(id)
             },
             relations: {
                 address: true,
-                type: true,
+                category: true,
                 disponibilities: true,
-                images: true,
-                caracterizations: true
+                images: true
             }
         })
 
-        if (!place) {
-            return res.status(404).json({error: {message: "Local não encontrado!"}});
+        if (!event) {
+            return res.status(404).json({error: {message: "Evento não encontrado!"}});
         }
 
         if (!req.file) {
@@ -185,10 +179,10 @@ export const uploadPlaceImage = async (req: Request, res: Response) => {
 
         const s3_result = await s3Upload(req.file);
         
-        const image = new PlaceImage();
+        const image = new EventImage();
     
         image.path = s3_result.Location;
-        image.place = place;
+        image.event = event;
         
         await manager.save(image);
 
@@ -198,11 +192,11 @@ export const uploadPlaceImage = async (req: Request, res: Response) => {
     }
 }
 
-export const deleteImage = async (req: Request, res: Response) => {
+export const deleteEventImage = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const images = AppDataSource.getRepository(PlaceImage);
+        const images = AppDataSource.getRepository(EventImage);
         const image = await images.findOneBy({id: parseInt(id)});
 
         if (!image) {
@@ -220,19 +214,19 @@ export const deleteImage = async (req: Request, res: Response) => {
     }
 }
 
-export const deletePlace = async (req: Request, res: Response) => {
+export const deleteEvent = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const places = AppDataSource.getRepository(Place);
-        const place = await places.findOneBy({id: parseInt(id)});
+        const events = AppDataSource.getRepository(Event);
+        const event = await events.findOneBy({id: parseInt(id)});
 
-        if (!place) {
-            return res.status(404).json({error: {message: "Local não encontrado!"}});
+        if (!event) {
+            return res.status(404).json({error: {message: "Evento não encontrado!"}});
         }
 
-        await places.remove(place);
-        return res.status(200).json({message: "Local removido com sucesso!", place});
+        await events.remove(event);
+        return res.status(200).json({message: "Evento removido com sucesso!", event});
 
     } catch (error) {
         return res.status(500).json(error);

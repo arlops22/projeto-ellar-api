@@ -5,7 +5,7 @@ export class CreateTableCaracterization1669600102319 implements MigrationInterfa
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: 'caracterization',
+                name: 'place_caracterization',
                 columns: [
                     {
                         name: 'id',
@@ -24,7 +24,7 @@ export class CreateTableCaracterization1669600102319 implements MigrationInterfa
 
         await queryRunner.createTable(
             new Table({
-                name: 'place_caracterizations_caracterization',
+                name: 'place_caracterizations_place_caracterization',
                 columns: [
                     {
                         name: 'placeId',
@@ -32,7 +32,7 @@ export class CreateTableCaracterization1669600102319 implements MigrationInterfa
                         isPrimary: true
                     },
                     {
-                        name: 'caracterizationId',
+                        name: 'placeCaracterizationId',
                         type: 'int',
                         isPrimary: true
                     }
@@ -41,7 +41,7 @@ export class CreateTableCaracterization1669600102319 implements MigrationInterfa
         );
 
         await queryRunner.createForeignKey(
-            "place_caracterizations_caracterization",
+            "place_caracterizations_place_caracterization",
             new TableForeignKey({
                 columnNames: ["placeId"],
                 referencedColumnNames: ["id"],
@@ -51,32 +51,32 @@ export class CreateTableCaracterization1669600102319 implements MigrationInterfa
         );
 
         await queryRunner.createForeignKey(
-            "place_caracterizations_caracterization",
+            "place_caracterizations_place_caracterization",
             new TableForeignKey({
-                columnNames: ["caracterizationId"],
+                columnNames: ["placeCaracterizationId"],
                 referencedColumnNames: ["id"],
-                referencedTableName: "caracterization",
+                referencedTableName: "place_caracterization",
                 onDelete: "CASCADE",
             }),
         );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        const table = await queryRunner.getTable("place_caracterizations_caracterization")
+        const table = await queryRunner.getTable("place_caracterizations_place_caracterization")
         const placesForeignKey = table?.foreignKeys.find(
             (fk) => (fk.columnNames.indexOf("placeId") !== -1),
         )
         if (placesForeignKey) {
-            await queryRunner.dropForeignKey("place_caracterizations_caracterization", placesForeignKey)
+            await queryRunner.dropForeignKey("place_caracterizations_place_caracterization", placesForeignKey)
         }
         const caracterizationForeignKey = table?.foreignKeys.find(
-            (fk) => (fk.columnNames.indexOf("caracterizationId") !== -1),
+            (fk) => (fk.columnNames.indexOf("placeCaracterizationId") !== -1),
         )
         if (caracterizationForeignKey) {
-            await queryRunner.dropForeignKey("place_caracterizations_caracterization", caracterizationForeignKey)
+            await queryRunner.dropForeignKey("place_caracterizations_place_caracterization", caracterizationForeignKey)
         }
-        await queryRunner.dropTable('place_caracterizations_caracterization');
-        await queryRunner.dropTable('caracterization');
+        await queryRunner.dropTable('place_caracterizations_place_caracterization');
+        await queryRunner.dropTable('place_caracterization');
     }
 
 }

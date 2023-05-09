@@ -15,7 +15,6 @@ export class NullableAddress1676468071013 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable('place');
     }
 
 }

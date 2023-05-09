@@ -2,11 +2,12 @@ import { Entity, OneToOne } from "typeorm";
 
 import { Place } from "./Place";
 import { Address } from "./Address";
+import { Event } from "./Event";
 
 
 @Entity()
-export class PlaceAddress extends Address{
+export class EventAddress extends Address{
 
     @OneToOne(() => Place, (place) => place.address)
-    place: Place
+    event: Event
 }

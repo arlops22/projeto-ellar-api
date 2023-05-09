@@ -1,18 +1,18 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Place } from "./Place";
+
+import { Event } from "./Event";
 
 @Entity()
-export class Type {
-
+export class EventCategory {
     @PrimaryGeneratedColumn()
     id: number
 
     @Column()
     name: string
     
-    @OneToMany(() => Place, (place) => place.type, {
+    @OneToMany(() => Event, (event) => event.category, {
         cascade: true
     })
-    places: Place[]
+    events: Event[]
 
 }

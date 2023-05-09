@@ -1,10 +1,11 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-import { Caracterization } from "./Caracterization";
 import { PlaceAddress } from "./PlaceAddress";
-import { PlaceImage } from "./PlaceImage";
+import { PlaceType } from "./PlaceType";
 import { PlaceDisponibility } from "./PlaceDisponibility";
-import { Type } from "./Type";
+import { PlaceImage } from "./PlaceImage";
+import { PlaceCaracterization } from "./PlaceCaracterization";
+
 
 @Entity()
 export class Place {
@@ -25,9 +26,9 @@ export class Place {
     @JoinColumn({name: 'place_addressId'})
     address: PlaceAddress
 
-    @ManyToOne(() => Type, (type) => type.places, {nullable: true})
-    @JoinColumn()
-    type: Type
+    @ManyToOne(() => PlaceType, (type) => type.places, {nullable: true})
+    @JoinColumn({name: 'placeTypeId'})
+    type: PlaceType
 
     @OneToMany(() => PlaceDisponibility, (disponibility) => disponibility.place, {cascade: true})
     disponibilities: PlaceDisponibility[]
@@ -35,7 +36,7 @@ export class Place {
     @OneToMany(() => PlaceImage, (image) => image.place, {cascade: true})
     images: PlaceImage[]
 
-    @ManyToMany(() => Caracterization)
+    @ManyToMany(() => PlaceCaracterization)
     @JoinTable()
-    caracterizations: Caracterization[]
+    caracterizations: PlaceCaracterization[]
 }
